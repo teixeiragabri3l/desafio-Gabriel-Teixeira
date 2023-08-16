@@ -1,0 +1,84 @@
+class CaixaDaLanchonete {
+    constructor() {
+        this.Cardapio = {
+            Café: 3.00,
+            Chantily: 1.50,
+            Suco: 6.20,
+            Sanduiche: 6.50,
+            Queijo: 2.00,
+            Salgado: 7.25,
+            Combo1: 9.50,
+            Combo2: 7.50
+        };
+        this.Formas_De_Pagamento = ["Credito", "Debito", "Dinheiro"];
+    }
+
+    calcularValorDaCompra(Formas_De_Pagamento, itens) {
+        if (!this.Formas_De_Pagamento.includes(Formas_De_Pagamento)) {
+            return "Forma de pagamento inválida!";
+        }
+
+        const itemQuantities = {};
+
+        for (const item of itens) {
+            const [codigo, quantidade] = item.split(',');
+
+            if (!this.Cardapio.hasOwnProperty(codigo)) {
+                return 'Item inválido!';
+            }
+
+            if (codigo === "Chantily" & !itemQuantities["Café"]) {
+                return 'Item extra não pode ser pedido sem o principal';
+            }
+
+            if (codigo === "Queijo" & !itemQuantities["Sanduiche"]) {
+                return 'Item extra não pode ser pedido sem o principal';
+            }
+
+            if (!itemQuantities[codigo]) {
+                itemQuantities[codigo] = 0;
+            }
+
+            itemQuantities[codigo] += parseInt(quantidade);
+        }
+
+        if (Object.keys(itemQuantities).length === 0) {
+            return 'Não há itens no carrinho de compra!';
+        }
+
+        let total = 0;
+
+        for (const codigo in itemQuantities) {
+            const quantidade = itemQuantities[codigo];
+            const precoUnitario = this.Cardapio[codigo];
+            total += quantidade * precoUnitario;
+        }
+
+        if (Formas_De_Pagamento === "Dinheiro") {
+            total *= 0.95; // Desconto de 5% para pagamento em Dinheiro
+        } else if (Formas_De_Pagamento === "Credito") {
+            total *= 1.03; // Acréscimo de 3% para pagamento a Crédito
+        }
+
+        const valorFormatado = `R$ ${total.toFixed(2)}`;
+        return valorFormatado;
+    }
+}
+
+// Exemplos de uso
+const caixa = new CaixaDaLanchonete();
+
+console.log(caixa.calcularValorDaCompra("Debito", ['Chantily,1'])); // "Item extra não pode ser pedido sem o principal"
+console.log(caixa.calcularValorDaCompra("Debito", ['Café,1', 'Chantily,1'])); // "R$ 4.50"
+console.log(caixa.calcularValorDaCompra("Credito", ['Combo1,1', 'Café,2'])); // "R$ 15.96"
+console.log(caixa.calcularValorDaCompra("Dinheiro", [])); // "Não há itens no carrinho de compra!"
+console.log(caixa.calcularValorDaCompra("Debito", ['Sanduiche,2', 'Café,1'])); // "R$ 17.65"
+console.log(caixa.calcularValorDaCompra("Credito", ['Combo1,1', 'Queijo,3'])); // "Item extra não pode ser pedido sem o principal"
+console.log(caixa.calcularValorDaCompra("Dinheiro", ['Suco,1', 'Salgado,2', 'Café,1', 'Chantily,1'])); // "R$ 23.83"
+console.log(caixa.calcularValorDaCompra("Cheque", ['Café,2', 'Salgado,1'])); // "Forma de pagamento inválida!"
+console.log(caixa.calcularValorDaCompra("Debito", ['Pão,2'])); // "Item inválido!"
+console.log(caixa.calcularValorDaCompra("Dinheiro", ['Combo2,1', 'Queijo,2', 'Café,1'])); // "Item extra não pode ser pedido sem o principal"
+console.log(caixa.calcularValorDaCompra("Credito", ['Sanduiche,2', 'Café,1', 'Suco,1'])); // "R$ 25.97"
+console.log(caixa.calcularValorDaCompra("Credito", ['Combo1,2', 'Sanduiche,3', 'Café,5'])); // "R$ 47.00" 
+console.log(caixa.calcularValorDaCompra("Boleto", ['Combo2,4', 'Café,2', 'Queijo,1'])); // "Forma de pagamento inválida!""
+console.log(caixa.calcularValorDaCompra("Debito", ['Queijo,3', 'Chantily,4'])) //"Item extra não pode ser pedido sem o principal"
